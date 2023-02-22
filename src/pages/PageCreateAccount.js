@@ -15,7 +15,7 @@ const ContentStyle = styled('div')(({ theme }) => ({
     padding: theme.spacing(12, 0),
   }));
 
-export default function PageCreateAccount({invite, token}) {
+export default function PageCreateAccount({invite}) {
     useTitle("Create Account")
 
     return (
@@ -34,7 +34,7 @@ export default function PageCreateAccount({invite, token}) {
 
       </Stack>
 
-    <CreateAccountForm invite={invite} token={token} />
+    <CreateAccountForm invite={invite}/>
 
     </ContentStyle>
   </Container>

@@ -7,7 +7,7 @@ import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {useAuth, axiosInstance, POST} from '../contexts/AuthContext';
 // ----------------------------------------------------------------------
 
-export default function CreateAccountForm({invite, token}) {
+export default function CreateAccountForm({invite}) {
     const { register } = useAuth();
     const [first, setFirst] = useState("");
     const [last, setLast] = useState("");
@@ -21,7 +21,8 @@ export default function CreateAccountForm({invite, token}) {
         e.preventDefault();
         setError('');
         try {
-            await register(email, first, last, password, cpassword, token);
+            let name = first + " " + last;
+            await register(email, name, password);
             if (token == null) {
                 navigate("/", {replace: true});
             }

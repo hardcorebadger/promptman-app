@@ -20,6 +20,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Stack, Paper, ListSubheader } from '@mui/material';
 import {useAuth }  from '../contexts/AuthContext';
 import { textTransform } from '@mui/system';
+import DirectoryTree from '../components/directory/DirectoryTree';
 
 const NavConfig = [
     { 'display' : 'Analytics', 'accessLevel':1 },
@@ -129,6 +130,7 @@ export default function Sidebar() {
                 </AccordionDetails>
             </StyledAccordion>
             <Divider />
+            <DirectoryTree />
             {/* {property &&
                 <StyledList dense={true}>
                     {NavConfig.map((item, index) => {

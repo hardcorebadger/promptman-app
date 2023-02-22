@@ -84,13 +84,11 @@ export function AuthProvider({ children }) {
     const initialize = async () => {
       try {
         const accessToken = localStorage.getItem('accessToken');
-        console.log("a");
         if (accessToken && isValidToken(accessToken)) {
           setSession(accessToken);
-          console.log("b");
           const response = await axiosInstance.get('/api/me');
 
-          const user  = response.data;
+          const { user }  = response.data;
           user.accessLevel = 1;
           console.log("User Logged in as:");
           console.log(user);
@@ -144,17 +142,13 @@ export function AuthProvider({ children }) {
     });
   };
 
-  const register = async (email, first_name, last_name, password, password_confirmation, token) => {
+  const register = async (email, name, password) => {
     let q = {
       "email": email,
       "password": password,
-      "first_name": first_name,
-      "last_name": last_name,
-      "password_confirmation": password_confirmation,
+      "name": name,
     };
-    if (token != null) {
-      q["state"] = token;
-    }
+   
     const response = await axiosInstance.post('/api/register', q);
     const { access_token, user } = response.data;
     console.log(user);
@@ -177,10 +171,10 @@ export function AuthProvider({ children }) {
   };
 
   const refreshUser = async () => {
-    const response = await GET('/api/user-profile', {});
+    const response = await GET('/api/me', {});
     if (!response.success)
       return;
-    const user  = response.response;   
+    const { user }  = response.response;   
     user.accessLevel = 1;
     dispatch({
       type: 'INITIALIZE',
