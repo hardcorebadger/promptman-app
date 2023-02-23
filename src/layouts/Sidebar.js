@@ -91,7 +91,7 @@ export default function Sidebar() {
     const { user } = useAuth();
     const isSuperadmin = (user.staff_role == "developer");
     return (
-        <div>
+        <div style={{height:"100%"}}>
             <Toolbar >
             <Box sx={{ width:"100%", display: { xs: 'none', sm: 'block' }}} >
                 <LogoBlock oreintation="sidebar" />

@@ -8,17 +8,25 @@ import { CustomNode } from "./CustomNode";
 import { CustomDragPreview } from "./CustomDragPreview";
 import styles from "./DirectoryTree.module.css";
 import SampleData from "./sample_data.json";
+import { useAuth, GET, PUT, POST, DELETE } from "../../contexts/AuthContext"
+import { LoadingButton } from "@mui/lab";
+import { Stack } from "@mui/material";
 
 export default function DirectoryTree() {
-  const [treeData, setTreeData] = useState(SampleData);
+  const [treeData, setTreeData] = useState(null);
   const handleDrop = (newTree) => setTreeData(newTree);
   const [draggingNode, setDraggingNode] = useState();
   const [nodeList, setNodeList] = useState([]);
+  const { user } = useAuth();
+  const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [refresh, setRefresh] = useState(0);
 
   function updateNode(node, depth, hasChild) {
     let checkExist = false;
+    let foundNode = null;
     nodeList.map((value) => {
       if (value.id == node.id) {
+        foundNode = value;
         value.depth = depth;
         value.hasChild = hasChild;
         value.parent = node.parent;
@@ -26,26 +34,16 @@ export default function DirectoryTree() {
       }
     });
     if (checkExist) {
+      // send req to update node foundNode
+      updateFileParent(node.id, node.parent);
       setNodeList(nodeList);
     } else {
       node.depth = depth;
       node.hasChild = hasChild;
       nodeList.push(node);
+      // send req to add a node
       setNodeList(nodeList);
     }
-  }
-
-  function checkChildIsFolder(parentID) {
-    let fileExist = false;
-
-    nodeList.map((value) => {
-      if (value.parent == parentID) {
-        if (value.data.fileType != "text") {
-          fileExist = true;
-        }
-      }
-    });
-    return fileExist;
   }
 
   function isRerootValid(dragID, dropID) {
@@ -82,7 +80,6 @@ export default function DirectoryTree() {
 
   }
 
-
   function getNode(nodeID) {
     let nodeTarget;
 
@@ -116,14 +113,62 @@ export default function DirectoryTree() {
     return dragTarget;
   }
 
+  async function addGroup() {
+    setIsAddingGroup(true);
+    let resp = await POST("/api/file/", {
+        "project":user.project.id,
+        "parent":null,
+        "name":"New Collection",
+        "type":"group"
+    });
+    setIsAddingGroup(false);
+    setRefresh(refresh+1);
+  }
+
+  async function loadFiles() {
+    let resp = await GET("/api/project/"+user.project.id+"/files");
+    setTreeData(transformFileTree(resp.response.files));
+  }
+
+  async function updateFileParent(id, parent) {
+    let resp = await PUT("/api/file/"+id, {"parent":parent});
+  }
+
+  async function updateFileName(id, name) {
+    let resp = await PUT("/api/file/"+id, {"name":name});
+  }
+
+  async function onDelete(id) {
+    let resp = await DELETE("/api/file/"+id);
+    setRefresh(refresh+1);
+  }
+
+  async function createChild(parentId, type, name) {
+    let resp = await POST("/api/file/", {
+        parent:parentId,
+        type:type,
+        name:name,
+        project:user.project.id
+    });
+    setRefresh(refresh+1);
+  }
+
   useEffect(() => {
-    console.log(nodeList);
-    // console.log(treeData);
-  }, [nodeList]);
+    console.log("refresh");
+    loadFiles();
+  }, [refresh]);
+
+  if (treeData) {
 
   return (
-    
+    <div style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column"
+    }}>
+        <LoadingButton sx={{m:1}} variant="contained" loading={isAddingGroup} onClick={() => addGroup()} >Add Group</LoadingButton>
           <Tree
+          style={{flexGrow:1}}
             tree={treeData}
             rootId={0}
             initialOpen={true}
@@ -140,6 +185,9 @@ export default function DirectoryTree() {
                 isDropTarget={isDropTarget}
                 draggingNode={draggingNode}
                 hasChild={hasChild}
+                onDelete={onDelete}
+                createChild={createChild}
+                updateName={updateFileName}
                 updateNode={(value) => {
                   updateNode(value, depth, hasChild);
                 }}
@@ -158,7 +206,7 @@ export default function DirectoryTree() {
                 let dragT = getDragTarget(dragSourceId);
 
                 if (dropT != null) {
-                  if (dropT.data.fileType != "text") {
+                  if (dropT.data.fileType == "group") {
                     return isRerootValid(dragSourceId, dropTargetId);
                     // if (dropT.depth >= 1) {
                     //   if (dragSource.data.fileType == "text") {
@@ -188,8 +236,42 @@ export default function DirectoryTree() {
               dropTarget: styles.dropTarget
             }}
           />
-     
+     </div>
   );
+
+    } else {
+        return (<span/>);
+    }
+}
+
+function transformFileTree(files) {
+    let tree = [];
+    files.forEach(function (f) {
+        let node = {
+            "id": f.id,
+            "parent": f.parent_id == null ? 0 : f.parent_id,
+            "droppable": f.type == "group",
+            "text": f.name,
+            "data": {
+                "fileType": f.type,
+                "content":f.content_id
+            } 
+        }
+        tree.push(node);
+    });
+    console.log(tree);
+    return tree;
 }
 
 // ref: https://codesandbox.io/s/custom-drag-preview-js-forked-otupwe?file=/src/theme.js:293-336
+
+// {
+//     "id": 2,
+//     "parent": 1,
+//     "droppable": false,
+//     "text": "File 1-1",
+//     "data": {
+//       "fileType": "text",
+//       "fileSize": "0.5MB"
+//     }
+//   },

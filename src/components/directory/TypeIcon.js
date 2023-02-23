@@ -45,12 +45,9 @@ export const TypeIcon = (props) => {
   }
 
   switch (props.fileType) {
-    case "image":
+    case "prompt":
       return <CloseSquare />;
-    case "csv":
-      return <CloseSquare />;
-    case "text":
-      return <CloseSquare />;
+   
     default:
       return null;
   }

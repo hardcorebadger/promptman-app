@@ -39,9 +39,9 @@ export default function DashboardLayout() {
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
+          // ModalProps={{
+          //   keepMounted: true, // Better open performance on mobile. (but it also makes everything mount 2 times)
+          // }}
           sx={{
             display: { xs: 'block', sm: 'none' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },

@@ -3,7 +3,7 @@ import { Paper, Stack, Typography, IconButton, TextField } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import Iconify from './Iconify';
 import { useState } from 'react';
-
+import ClickAwayListener from '@mui/base/ClickAwayListener';
 
 // const StickyPaper = styled(Paper)(({ theme }) => ({
 //     width: "calc(100% - 40px)",
@@ -40,4 +40,35 @@ export default function EditableTypography({variant, value, onChange}) {
         </Stack>
         
     );
+}
+
+
+export function EditableTypographyControlled({variant, value, isEditing, onChange, onEsc}) {
+
+    if (isEditing) {
+        return (
+            <ClickAwayListener onClickAway={onEsc}>
+            <TextField 
+            /* styles the wrapper */
+            style={{ height:6, top:-10 }}
+            /* styles the input component */
+            inputProps={{
+                style: {
+                    height:1,
+                    padding: '0 8px',
+                },
+            }}
+            variant="outlined" value={value} size="small"
+            onChange={(event) => {
+                onChange(event.target.value);
+            }}
+            />
+            </ClickAwayListener>
+        );
+    } else {
+        return (
+        <Typography variant={variant} >{value}</Typography>
+        );
+    }
+    
 }

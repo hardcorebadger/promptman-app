@@ -4,10 +4,36 @@ import Typography from "@mui/material/Typography";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { TypeIcon } from "./TypeIcon";
 import styles from "./CustomNode.module.css";
+import { Stack } from "@mui/material";
+import ActionMenu from "./ActionMenu";
+import {EditableTypographyControlled} from "../EditableTypography";
 
 export const CustomNode = (props) => {
   const { droppable, data } = props.node;
-  const indent = 20+ props.depth * 24;
+  const indent = 10+ props.depth * 24;
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [curName, setCurName] = useState(props.node.text);
+
+  const getActions = () => {
+    let actions = [
+        {name:"Delete", shouldClose:true, callback:() => {props.onDelete(props.node.id)}},
+        {name:"Rename", shouldClose:true, callback:() => setIsEditingName(true)}
+        ];
+    if (props.node.data.fileType == "group") {
+        actions.push({
+            name:"New Prompt", 
+            shouldClose:true, 
+            callback:() => {props.createChild(props.node.id, "prompt", "New Prompt")}
+        });
+        actions.push({
+            name:"New Collection", 
+            shouldClose:true, 
+            callback:() => {props.createChild(props.node.id, "group", "New Collection")}
+        });
+    }
+    return actions;
+  }
+  
 
   const handleToggle = (e) => {
     e.stopPropagation();
@@ -33,20 +59,25 @@ export const CustomNode = (props) => {
   //   props.setDraggingNode(props.node);
   // }, [props.isDragging]);
 
-  return (
-    <div
-      className={`tree-node ${styles.root}`}
-      style={{ paddingInlineStart: indent }}
-    >
-      
-      <div>
-      <div onClick={handleToggle}>
-      <TypeIcon droppable={droppable} fileType={data?.fileType} isOpen={props.isOpen} />
-        </div>
-      </div>
-      <div className={styles.labelGridItem} onClick={handleSelect}>
-        <Typography variant="body2">{props.node.text}</Typography>
-      </div>
-    </div>
-  );
+
+const actions = getActions();
+return (
+    <Stack className={`tree-node ${styles.root}`}
+     style={{ paddingInlineStart: indent, paddingInlineEnd:10 }} 
+     direction="row"  justifyContent="space-between" alignItems="center"
+     >
+        <Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={1}>
+            <div onClick={handleToggle}>
+                <TypeIcon droppable={droppable} fileType={data?.fileType} isOpen={props.isOpen} />
+            </div>
+            <EditableTypographyControlled variant="body2" isEditing={isEditingName} onEsc={() => {setIsEditingName(false);props.updateName(props.node.id,curName)}} onChange={setCurName} value={curName} />
+        </Stack>
+        <Stack direction="row" justifyContent="flex-end" alignItems="center">
+            <ActionMenu className={styles.actionMenu}
+            actions= {actions}
+            />
+          
+        </Stack>
+    </Stack>
+);
 };
