@@ -17,6 +17,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import MoreIcon from '@mui/icons-material/MoreVert';
 import LogoBlock from '../components/LogoBlock';
 import {useAuth}  from '../contexts/AuthContext';
+import DraggableTabsList from '../components/tabs/DraggableTabList';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.background.default,
@@ -176,75 +177,10 @@ export default function PrimarySearchAppBar(props) {
           width: { sm: `calc(100% - ${props.drawerWidth}px)` },
           ml: { sm: `${props.drawerWidth}px` },
         }}>
-        <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="open drawer"
-            onClick={props.handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
-            <Box sx={{ display: { xs: 'block', sm: 'none' },  mr: 2}} >
-                <LogoBlock oreintation="header" />
-            </Box>
-            <Box sx={{ flexGrow: 1 }} />
-          {false &&
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ 'aria-label': 'search' }}
-            />
-          </Search>
-          }
-          <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-          {false &&
-            <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            }
-            {false &&
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            }
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              <AccountCircle />
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
+        <Toolbar style={{paddingLeft:0, paddingRight:0}}>
+          
+            <DraggableTabsList />
+          
         </Toolbar>
       </StyledAppBar>
       {renderMobileMenu}
