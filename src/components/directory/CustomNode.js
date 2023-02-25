@@ -40,7 +40,7 @@ export const CustomNode = (props) => {
     props.onToggle(props.node.id);
   };
 
-  const handleSelect = (e) => {
+  const handleSelection = (e) => {
     e.stopPropagation();
     props.onSelect(props.node.id);
   };
@@ -65,6 +65,7 @@ return (
     <Stack className={`tree-node ${styles.root}`}
      style={{ paddingInlineStart: indent, paddingInlineEnd:10 }} 
      direction="row"  justifyContent="space-between" alignItems="center"
+     onClick={handleSelection}
      >
         <Stack direction="row" justifyContent="flex-start" alignItems="center" spacing={1}>
             <div onClick={handleToggle}>

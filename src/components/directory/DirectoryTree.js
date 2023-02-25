@@ -11,6 +11,8 @@ import SampleData from "./sample_data.json";
 import { useAuth, GET, PUT, POST, DELETE } from "../../contexts/AuthContext"
 import { LoadingButton } from "@mui/lab";
 import { Stack } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import eventBus from "../../hooks/eventBus";
 
 export default function DirectoryTree() {
   const [treeData, setTreeData] = useState(null);
@@ -20,6 +22,7 @@ export default function DirectoryTree() {
   const { user } = useAuth();
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [refresh, setRefresh] = useState(0);
+  const navigate = useNavigate();
 
   function updateNode(node, depth, hasChild) {
     let checkExist = false;
@@ -135,12 +138,23 @@ export default function DirectoryTree() {
   }
 
   async function updateFileName(id, name) {
+    let n = getNode(id);
+    n.text = name;
     let resp = await PUT("/api/file/"+id, {"name":name});
+    eventBus.dispatch("fileRename", n);
   }
 
   async function onDelete(id) {
     let resp = await DELETE("/api/file/"+id);
     setRefresh(refresh+1);
+  }
+
+ function onSelect(id) {
+    let node = getNode(id);
+    if (node.data.fileType == "group")
+        return;
+    let path = '/dashboard/' + node.data.fileType + '/' + node.data.content
+    navigate(path);
   }
 
   async function createChild(parentId, type, name) {
@@ -186,6 +200,7 @@ export default function DirectoryTree() {
                 draggingNode={draggingNode}
                 hasChild={hasChild}
                 onDelete={onDelete}
+                onSelect={onSelect}
                 createChild={createChild}
                 updateName={updateFileName}
                 updateNode={(value) => {

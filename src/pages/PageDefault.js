@@ -2,9 +2,11 @@ import * as React from 'react';
 import Footer from '../components/PageFooter';
 import { Container, Grid, Typography, Stack, Button, FormControl, Select, InputLabel, MenuItem } from '@mui/material';
 import {useAuth}  from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function PageDefault() {
     const { logout, user } = useAuth();
+    const navigate = useNavigate();
   return (
     <Container sx={{ mt:2 }}>
         
@@ -31,7 +33,7 @@ export default function PageDefault() {
             </Grid>
             <Grid item xs={6}>
                 <Stack spacing={2} direction="row">
-            <Button variant="text" onClick={logout}>Text</Button>
+            <Button variant="text" onClick={()=>navigate('/dashboard/prompt/1')}>Text</Button>
             <Button variant="contained">Contained</Button>
             <Button variant="outlined">Outlined</Button>
             </Stack>

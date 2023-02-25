@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect} from "react";
 import Box from "@mui/material/Box";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
@@ -10,6 +10,32 @@ import Stack from "@mui/material/Stack";
 import { styled, Tabs } from "@mui/material";
 import Iconify from "../Iconify";
 import { IconButton } from "@mui/material";
+import {
+    MemoryRouter,
+    Route,
+    Routes,
+    Link,
+    matchPath,
+    useLocation,
+    useNavigate,
+    useParams
+  } from 'react-router-dom';
+import { StaticRouter } from 'react-router-dom/server';
+import eventBus from "../../hooks/eventBus";
+
+// function useRouteMatch(patterns) {
+//     const { pathname } = useLocation();
+
+//     for (let i = 0; i < patterns.length; i += 1) {
+//         const pattern = patterns[i];
+//         const possibleMatch = matchPath(pattern, pathname);
+//         if (possibleMatch !== null) {
+//         return possibleMatch;
+//         }
+//     }
+
+//     return null;
+// }
 
 const StyledTabs = styled((props) => (
     <Tabs
@@ -63,15 +89,81 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
   );
 
 export default function DraggableTabsList(props) {
-  const [value, setValue] = React.useState("1");
-  const [tabs, setTabs] = React.useState(
-    [...Array(20)].map((_, index) => ({
-      id: `tab${index + 1}`,
-      label: `Tab Name ${index + 1}`,
-      value: `${index + 1}`,
-      content: `Content ${index + 1}`
-    }))
-  );
+    const [navOnRefresh, setNavOnRefresh] = useState(null);
+    const [tabs, setTabs] = useState([]);
+    const [newTab, setNewTab] = useState(null);
+    const { pathname } = useLocation();
+    const { id } = useParams();
+    const navigate = useNavigate();
+
+    // when we are about to reroute after clsing a tab, use the nw route
+    let value = navOnRefresh != null ? navOnRefresh : pathname;
+    let found = false;
+    tabs.forEach(function(tab) {
+        if (tab.value == pathname) {
+            found = true;
+        }
+    });
+    if (!found) {
+        value = false;
+    }
+    
+    if (newTab != null) {
+        
+        found = false;
+        tabs.forEach(function(tab) {
+            if (tab.id == newTab.id) {
+                found = true;
+            }
+        });
+        if (!found) {
+            console.log("adding tab" + tabs.length);
+            const newTabs = Array.from(tabs);
+            newTabs.splice(0,0,newTab);
+            console.log(newTabs.length);
+            setNewTab(null);
+            setTabs(newTabs);
+            
+        }
+    }
+
+    // listen to routing, if we route to a prompt not in the tabs, make a tab for it
+    // useEffect(() => {
+    //     const possibleMatch = matchPath('/dashboard/prompt/:id', pathname);
+    //     if (possibleMatch !== null) {
+    //         let found = false;
+    //         tabs.forEach(function(tab) {
+    //             if (tab.value == pathname) {
+    //                 found = true;
+    //             }
+    //         });
+    //         if (!found) {
+    //             const newTabs = Array.from(tabs);
+    //             newTabs.splice(0, 0, 
+    //                 {id: id, label: "Prompt "+id , value:pathname, to:pathname}
+    //             );
+    //             setTabs(newTabs);
+    //         }
+    //     }
+ 
+    // }, [pathname]);
+
+    // when a tab is closed, set a state variable to navigate to another tab and re-mount
+    useEffect(() => {
+        if (navOnRefresh != null) {
+            navigate(navOnRefresh, {replace:true});
+            setNavOnRefresh(null);
+        }
+    }, [tabs]);
+//fileRename
+    useEffect(() => {
+        eventBus.on("promptOpened", (prompt) => {
+            setNewTab({id: prompt.id, label: prompt.name , value:"/dashboard/prompt/"+prompt.id, to:"/dashboard/prompt/"+prompt.id});
+        });
+        return () => {
+            eventBus.remove("promptOpened");
+        }
+      }, []);
 
   const onDragEnd = (result) => {
     const newTabs = Array.from(tabs);
@@ -80,23 +172,22 @@ export default function DraggableTabsList(props) {
     setTabs(newTabs);
   };
 
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-  };
-
   const closeTab = (index) => {
     const newTabs = Array.from(tabs);
     newTabs.splice(index,1);
     setTabs(newTabs);
+    // console.log("close tab: " + (newTab == null));
+    setNewTab(null);
     if (newTabs.length > index)
-        setValue(newTabs[index].value);
+        setNavOnRefresh(newTabs[index].value);
     else if (newTabs.length > 0) 
-        setValue(newTabs[newTabs.length-1].value);
+        setNavOnRefresh(newTabs[newTabs.length-1].value);
+    else
+    setNavOnRefresh('/');
   }
 
   const _renderTabList = (droppableProvided) => (
     <StyledTabs
-      onChange={handleChange}
       aria-label="Draggable Tabs"
       variant="scrollable"
       scrollButtons={false}
@@ -104,6 +195,8 @@ export default function DraggableTabsList(props) {
     >
       {tabs.map((tab, index) => {
         const child = <StyledTab 
+        component={Link}
+        to={tab.to}
         wrapped={false} label={tab.label} 
         value={tab.value} key={index} 
         icon={<IconButton
@@ -147,6 +240,7 @@ export default function DraggableTabsList(props) {
     </DragDropContext>
   );
 
+   
   return (
     <Stack direction="column">{_renderTabListWrappedInDroppable()}</Stack>
   );

@@ -60,7 +60,10 @@ export default function Router() {
       children: [
         { element: <Navigate to="/dashboard/home" replace />, index: true },
         { path: '/dashboard', element: <Navigate to="/dashboard/home" replace /> },
-        { path: '/dashboard/home', element: <PageDefault /> },       
+        { path: '/dashboard/home', element: <PageEmptyState /> },   
+        { path: '/dashboard/default', element: <PageDefault /> },       
+        { path: '/dashboard/prompt/:id', element: <PagePrompt /> },       
+
         //role guard example { path: '/dashboard/settings', element: <RoleGuard accessLevel={2}><PageSettings /></RoleGuard> },
         // { path: '/empty-state', element: <PageEmptyState /> },
 
@@ -96,6 +99,8 @@ export default function Router() {
 
 
 // Dashboard
+const PagePrompt = Loadable(lazy(() => import('../pages/PagePrompt')));
+
 const PageDefault = Loadable(lazy(() => import('../pages/PageDefault')));
 const Page404 = Loadable(lazy(() => import('../pages/Page404')));
 const PageEmptyState = Loadable(lazy(() => import('../pages/PageEmptyState')));
