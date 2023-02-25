@@ -141,12 +141,14 @@ export default function DirectoryTree() {
     let n = getNode(id);
     n.text = name;
     let resp = await PUT("/api/file/"+id, {"name":name});
-    eventBus.dispatch("fileRename", n);
+    eventBus.dispatch("fileRenamed", n);
   }
 
   async function onDelete(id) {
+    let n = getNode(id);
     let resp = await DELETE("/api/file/"+id);
     setRefresh(refresh+1);
+    eventBus.dispatch("fileDeleted", n);
   }
 
  function onSelect(id) {

@@ -96,36 +96,7 @@ export default function DraggableTabsList(props) {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // when we are about to reroute after clsing a tab, use the nw route
-    let value = navOnRefresh != null ? navOnRefresh : pathname;
-    let found = false;
-    tabs.forEach(function(tab) {
-        if (tab.value == pathname) {
-            found = true;
-        }
-    });
-    if (!found) {
-        value = false;
-    }
     
-    if (newTab != null) {
-        
-        found = false;
-        tabs.forEach(function(tab) {
-            if (tab.id == newTab.id) {
-                found = true;
-            }
-        });
-        if (!found) {
-            console.log("adding tab" + tabs.length);
-            const newTabs = Array.from(tabs);
-            newTabs.splice(0,0,newTab);
-            console.log(newTabs.length);
-            setNewTab(null);
-            setTabs(newTabs);
-            
-        }
-    }
 
     // listen to routing, if we route to a prompt not in the tabs, make a tab for it
     // useEffect(() => {
@@ -158,10 +129,40 @@ export default function DraggableTabsList(props) {
 //fileRename
     useEffect(() => {
         eventBus.on("promptOpened", (prompt) => {
-            setNewTab({id: prompt.id, label: prompt.name , value:"/dashboard/prompt/"+prompt.id, to:"/dashboard/prompt/"+prompt.id});
+            setNewTab({
+                shouldAdd: true,
+                shouldRemove: false,
+                tab: {id: prompt.id, label: prompt.name , value:"/dashboard/prompt/"+prompt.id, to:"/dashboard/prompt/"+prompt.id}
+            });
         });
         return () => {
             eventBus.remove("promptOpened");
+        }
+      }, []);
+
+      useEffect(() => {
+        eventBus.on("fileRenamed", (file) => {
+            setNewTab({
+                shouldAdd: false,
+                shouldRemove: false,
+                tab: {id: file.data.content, label: file.text , value:"/dashboard/"+file.data.type+"/"+file.data.content, to:"/dashboard/"+file.data.type+"/"+file.data.content}
+            });
+        });
+        return () => {
+            eventBus.remove("fileRenamed");
+        }
+      }, []);
+
+      useEffect(() => {
+        eventBus.on("fileDeleted", (file) => {
+            setNewTab({
+                shouldAdd: false,
+                shouldRemove: true,
+                tab: {id: file.data.content, label: file.text , value:"/dashboard/"+file.data.type+"/"+file.data.content, to:"/dashboard/"+file.data.type+"/"+file.data.content}
+            });
+        });
+        return () => {
+            eventBus.remove("fileDeleted");
         }
       }, []);
 
@@ -184,6 +185,55 @@ export default function DraggableTabsList(props) {
         setNavOnRefresh(newTabs[newTabs.length-1].value);
     else
     setNavOnRefresh('/');
+  }
+
+  // when we are about to reroute after clsing a tab, use the nw route
+  let value = navOnRefresh != null ? navOnRefresh : pathname;
+  let found = false;
+  tabs.forEach(function(tab) {
+      if (tab.value == pathname) {
+          found = true;
+      }
+  });
+  if (!found) {
+      value = false;
+  }
+  
+  if (newTab != null) {
+      
+      found = false;
+      tabs.forEach(function(tab) {
+          if (tab.id == newTab.tab.id) {
+              found = true;
+          }
+      });
+      if (!found && newTab.shouldAdd) {
+          console.log("adding tab" + tabs.length);
+          const newTabs = Array.from(tabs);
+          newTabs.splice(0,0,newTab.tab);
+          console.log(newTabs.length);
+          setNewTab(null);
+          setTabs(newTabs);
+      } else if (found && !newTab.shouldRemove) {
+          console.log("updating tabs" + tabs.length);
+          const newTabs = Array.from(tabs);
+          newTabs.forEach(function(tab) {
+              if (tab.id == newTab.tab.id) {
+                  tab.label = newTab.tab.label;
+              }
+          });
+          setNewTab(null);
+          setTabs(newTabs);
+      } else if (found && newTab.shouldRemove) {
+          console.log("deleting tab" + tabs.length);
+          const newTabs = Array.from(tabs);
+          let x = -1;
+          for (var i = 0; i < newTabs.length; i++) {
+              if (newTabs[i].id == newTab.tab.id)
+                  x = i;
+          }
+          closeTab(x);
+      }
   }
 
   const _renderTabList = (droppableProvided) => (
