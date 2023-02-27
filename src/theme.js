@@ -23,7 +23,7 @@ const theme = createTheme({
       paper: '#0f2843',
       error: "#230F21",
       success: "#123a41",
-      well: "#0e2237",
+      well: "#072239",
       highlight: "#0F2843"
     },
     text: {
@@ -113,9 +113,9 @@ const theme = createTheme({
         input: {
           fontSize: "0.875rem",
           fontWeight: "bold",
-          paddingTop: "12px !important",
-          paddingBottom: "12px !important",
+         
         },
+       
         fieldset: {
           fontSize: "0.875rem",
           fontWeight: "bold",

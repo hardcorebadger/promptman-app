@@ -49,6 +49,7 @@ export function EditableTypographyControlled({variant, value, isEditing, onChang
         return (
             <ClickAwayListener onClickAway={onEsc}>
             <TextField 
+            onClick={(event) => event.stopPropagation()}
             /* styles the wrapper */
             style={{ height:6, top:-10 }}
             /* styles the input component */

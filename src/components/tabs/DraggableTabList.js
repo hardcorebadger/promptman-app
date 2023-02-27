@@ -177,7 +177,6 @@ export default function DraggableTabsList(props) {
     const newTabs = Array.from(tabs);
     newTabs.splice(index,1);
     setTabs(newTabs);
-    // console.log("close tab: " + (newTab == null));
     setNewTab(null);
     if (newTabs.length > index)
         setNavOnRefresh(newTabs[index].value);
@@ -208,14 +207,11 @@ export default function DraggableTabsList(props) {
           }
       });
       if (!found && newTab.shouldAdd) {
-          console.log("adding tab" + tabs.length);
           const newTabs = Array.from(tabs);
           newTabs.splice(0,0,newTab.tab);
-          console.log(newTabs.length);
           setNewTab(null);
           setTabs(newTabs);
       } else if (found && !newTab.shouldRemove) {
-          console.log("updating tabs" + tabs.length);
           const newTabs = Array.from(tabs);
           newTabs.forEach(function(tab) {
               if (tab.id == newTab.tab.id) {
@@ -225,7 +221,6 @@ export default function DraggableTabsList(props) {
           setNewTab(null);
           setTabs(newTabs);
       } else if (found && newTab.shouldRemove) {
-          console.log("deleting tab" + tabs.length);
           const newTabs = Array.from(tabs);
           let x = -1;
           for (var i = 0; i < newTabs.length; i++) {
