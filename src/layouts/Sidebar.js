@@ -21,6 +21,7 @@ import { Stack, Paper, ListSubheader } from '@mui/material';
 import {useAuth }  from '../contexts/AuthContext';
 import { textTransform } from '@mui/system';
 import DirectoryTree from '../components/directory/DirectoryTree';
+import {useTheme} from '@mui/material';
 
 const NavConfig = [
     { 'display' : 'Analytics', 'accessLevel':1 },
@@ -76,11 +77,11 @@ const StyledList = styled(List)(({ theme }) => ({
 
   const StyledAccordion = styled(Accordion)(({ theme }) => ({
       '&.MuiPaper-root' : {
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.background.well,
       },
     '&.Mui-expanded': {
         margin: 0,
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: theme.palette.background.well,
         '& .MuiAccordionSummary-content': {
         }
     }
@@ -90,15 +91,9 @@ export default function Sidebar() {
     const location = useLocation();
     const { user } = useAuth();
     const isSuperadmin = (user.staff_role == "developer");
-    return (
-        <div style={{height:"100%"}}>
-            <Toolbar >
-            <Box sx={{ width:"100%", display: { xs: 'none', sm: 'block' }}} >
-                <LogoBlock oreintation="sidebar" />
-            </Box>
+    const theme = useTheme();
 
-            </Toolbar>
-            <Divider />
+    const oldAccordion = (
             <StyledAccordion elevation={0}>
                 <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
@@ -129,6 +124,27 @@ export default function Sidebar() {
             </List>
                 </AccordionDetails>
             </StyledAccordion>
+    );
+
+    return (
+        <div style={{height:"100%", backgroundColor: theme.palette.background.well}}>
+            <Toolbar >
+            <Box sx={{ width:"100%", display: { xs: 'none', sm: 'block' }}} >
+                <LogoBlock oreintation="sidebar" />
+            </Box>
+            
+            </Toolbar>
+            <Divider />
+            {/* old acordion used to go header */}
+            <Stack direction="row" spacing={2} sx={{p:2}}>
+                <Paper sx={{width:42, height:42, lineHeight:'42px', textAlign:'center'}}>
+                P
+                </Paper>
+                <Stack direction="column" spacing={0}>
+                <Typography variant="body" component="div" sx={{mb:0, pb:0}}>{user.name}</Typography>
+                <NoOverflowTypography variant="caption" color="text.secondary" component="div" sx={{mt:0, pt:0}}>{user.project.name}</NoOverflowTypography>
+                </Stack>
+            </Stack>
             <Divider />
             <DirectoryTree />
             {/* {property &&

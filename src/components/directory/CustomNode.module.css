@@ -4,8 +4,12 @@
   }
 
 .root:hover {
-background-color: #1c334d;
+background-color: #153151;
 }
+
+.root.selected {
+    background-color: #153151;
+}   
 
 .root .actionMenu {
 opacity: 0;
@@ -14,4 +18,3 @@ opacity: 0;
 .root:hover .actionMenu {
     opacity: 1;
 }
-  

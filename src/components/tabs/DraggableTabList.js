@@ -73,7 +73,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
       minHeight: "unset",
       '&.Mui-selected': {
         color: '#fff',
-        backgroundColor: "#072239",
+        backgroundColor: "#0a1929",
       },
       '&.Mui-focusVisible': {
         backgroundColor: 'rgba(100, 95, 228, 0.32)',

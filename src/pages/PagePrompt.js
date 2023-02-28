@@ -145,7 +145,7 @@ export default function PagePrompt() {
 
   return (
     <PageLayoutFullHeight>
-<div style={{height: '100%', width: '100%', position:'relative', backgroundColor: theme.palette.background.well}}>
+<div style={{height: '100%', width: '100%', position:'relative', backgroundColor: theme.palette.background.default}}>
         <StyledSplitPane split="horizontal" minSize={200} defaultSize={300} style={{height:"100%"}} primary="second">
             <Pane style={{height: '100%', width: '100%'}} className="">
                 <div style={{height: '100%', width: '100%', position:'relative', padding:25}} >
@@ -189,7 +189,7 @@ export default function PagePrompt() {
 }
                 <Divider />
                 
-                <div style={{height: 'calc(100% - 80px)', minHeight: 'calc(100% - 80px)', overflowY:'scroll', width: '100%', position:'relative', padding:'20px', backgroundColor: darken(theme.palette.background.well, 0.1)}}>
+                <div style={{height: 'calc(100% - 80px)', minHeight: 'calc(100% - 80px)', overflowY:'scroll', width: '100%', position:'relative', padding:'20px', backgroundColor: darken(theme.palette.background.default, 0.1)}}>
                 <Typography variant="code">{completion?.choices[0].text}</Typography>
                 </div>
                 </div>

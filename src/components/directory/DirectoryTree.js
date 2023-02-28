@@ -182,7 +182,7 @@ export default function DirectoryTree() {
         display: "flex",
         flexDirection: "column"
     }}>
-        <LoadingButton sx={{m:1}} variant="contained" loading={isAddingGroup} onClick={() => addGroup()} >Add Group</LoadingButton>
+        <LoadingButton sx={{m:1}} variant="outlined" loading={isAddingGroup} onClick={() => addGroup()} >Add Group</LoadingButton>
           <Tree
           style={{flexGrow:1}}
             tree={treeData}

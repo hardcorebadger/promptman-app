@@ -7,12 +7,15 @@ import styles from "./CustomNode.module.css";
 import { Stack } from "@mui/material";
 import ActionMenu from "./ActionMenu";
 import {EditableTypographyControlled} from "../EditableTypography";
+import { useLocation, useParams } from "react-router-dom";
 
 export const CustomNode = (props) => {
   const { droppable, data } = props.node;
   const indent = 10+ props.depth * 24;
   const [isEditingName, setIsEditingName] = useState(false);
   const [curName, setCurName] = useState(props.node.text);
+  const { pathname } = useLocation();
+  const { id } = useParams();
 
   const getActions = () => {
     let actions = [
@@ -61,8 +64,9 @@ export const CustomNode = (props) => {
 
 
 const actions = getActions();
+const isActive = (data && id && id == parseInt(data.content));
 return (
-    <Stack className={`tree-node ${styles.root}`}
+    <Stack className={`tree-node ${styles.root} ${(isActive && styles.selected)}`}
      style={{ paddingInlineStart: indent, paddingInlineEnd:10 }} 
      direction="row"  justifyContent="space-between" alignItems="center"
      onClick={handleSelection}

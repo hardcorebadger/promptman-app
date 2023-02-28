@@ -20,14 +20,14 @@ import {useAuth}  from '../contexts/AuthContext';
 import DraggableTabsList from '../components/tabs/DraggableTabList';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
-  backgroundColor: theme.palette.background.default,
+  backgroundColor: theme.palette.background.well,
   color: theme.palette.text.primary,
   boxShadow: 'none',
   borderBottomColor: theme.palette.divider,
   borderBottomWidth: 1,
   borderBottomStyle: 'solid',
   '& .MuiToolbar-root': {
-      backgroundColor: theme.palette.background.default
+      backgroundColor: theme.palette.background.well
     }
 }));
 
@@ -171,7 +171,7 @@ export default function PrimarySearchAppBar(props) {
   );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box >
       <StyledAppBar position="fixed"
         sx={{
           width: { sm: `calc(100% - ${props.drawerWidth}px)` },
