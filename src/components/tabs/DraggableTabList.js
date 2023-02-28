@@ -90,7 +90,7 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
 
 export default function DraggableTabsList(props) {
     const [navOnRefresh, setNavOnRefresh] = useState(null);
-    const [tabs, setTabs] = useState([]);
+    const [tabs, setTabs] = useState(loadCache());
     const [newTab, setNewTab] = useState(null);
     const { pathname } = useLocation();
     const { id } = useParams();
@@ -166,6 +166,10 @@ export default function DraggableTabsList(props) {
         }
       }, []);
 
+    useEffect(() => {
+        localStorage.setItem("tabs-cache", JSON.stringify(tabs));
+    }, [tabs]);
+
   const onDragEnd = (result) => {
     const newTabs = Array.from(tabs);
     const draggedTab = newTabs.splice(result.source.index, 1)[0];
@@ -174,6 +178,8 @@ export default function DraggableTabsList(props) {
   };
 
   const closeTab = (index) => {
+    // dump the page cache (janky)
+    localStorage.removeItem('prompt-cache-'+tabs[index].id);
     const newTabs = Array.from(tabs);
     newTabs.splice(index,1);
     setTabs(newTabs);
@@ -289,4 +295,15 @@ export default function DraggableTabsList(props) {
   return (
     <Stack direction="column">{_renderTabListWrappedInDroppable()}</Stack>
   );
+}
+
+function loadCache() {
+   let raw = localStorage.getItem("tabs-cache");
+   if (raw == null) {
+        return [];
+   }
+   let parsed = JSON.parse(raw);
+   if (parsed.length < 1)
+        return [];
+   return parsed;
 }

@@ -113,9 +113,9 @@ const theme = createTheme({
         input: {
           fontSize: "0.875rem",
           fontWeight: "bold",
-         
+          paddingTop: "12px !important",
+          paddingBottom: "12px !important",
         },
-       
         fieldset: {
           fontSize: "0.875rem",
           fontWeight: "bold",
@@ -236,6 +236,10 @@ const theme = createTheme({
       fontSize:"1rem",
       fontWeight:"bold"
     },
+    code: {
+      fontSize:"0.9rem",
+      fontFamily: "'Source Code Pro', monospace"
+    }
 
   },
 });

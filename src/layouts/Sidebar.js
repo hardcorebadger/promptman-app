@@ -110,8 +110,8 @@ export default function Sidebar() {
                     P
                     </Paper>
                     <Stack direction="column" spacing={0}>
-                    <Typography variant="body" component="div" sx={{mb:0, pb:0}}>User Name</Typography>
-                    <NoOverflowTypography variant="caption" color="text.secondary" component="div" sx={{mt:0, pt:0}}>Property Name</NoOverflowTypography>
+                    <Typography variant="body" component="div" sx={{mb:0, pb:0}}>{user.name}</Typography>
+                    <NoOverflowTypography variant="caption" color="text.secondary" component="div" sx={{mt:0, pt:0}}>{user.project.name}</NoOverflowTypography>
                     </Stack>
                 </Stack>
                 </AccordionSummary>
