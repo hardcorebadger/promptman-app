@@ -62,7 +62,8 @@ export default function ActionMenu({actions, className}) {
         }}
       >
          {actions.map((action, i) => (
-        <MenuItem key={i} onClick={() => {
+        <MenuItem key={i} onClick={(e) => {
+            e.stopPropagation();
             if (action.shouldClose) {setAnchorEl(null);}
             action.callback();
         }}>{action.name}</MenuItem>

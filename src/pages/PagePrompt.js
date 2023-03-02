@@ -42,6 +42,8 @@ export default function PagePrompt() {
     const [running, setRunning] = useState(false);
     const [runResp, setRunResp] = useState(null);
     const [completion, setCompletion] = useState(null);
+    const [promptUsage, setPromptUsage] = useState(0);
+    const [completionUsage, setCompletionUsage] = useState(0);
     const theme = useTheme();
     const navigate = useNavigate();
 
@@ -51,6 +53,8 @@ export default function PagePrompt() {
             setCompletion(cache.completion);
             setPayload(cache.payload);
             setSettings(cache.settings);
+            setPromptUsage(cache.promptUsage);
+            setCompletionUsage(cache.completionUsage);
             setName(cache.name);
             cache.id = id;
             eventBus.dispatch("promptOpened", cache);
@@ -63,6 +67,8 @@ export default function PagePrompt() {
             setPayload("");
             setSettings(null);
             setName(null);
+            setPromptUsage(0);
+            setCompletionUsage(0);
             let resp = await GET("/api/prompt/"+id);
             if (resp.success == false)
                 navigate('/');
@@ -93,8 +99,12 @@ export default function PagePrompt() {
                 return;
             if (resp.success) {
                 setCompletion(resp.response.completion.choices[0].text);
+                setPromptUsage(resp.response.completion.usage.prompt_tokens);
+                setCompletionUsage(resp.response.completion.usage.completion_tokens);
             } else {
                 setCompletion(resp.response.message);
+                setPromptUsage(0);
+                setCompletionUsage(0);
             }
             setRunResp(null);
         }
@@ -127,7 +137,9 @@ export default function PagePrompt() {
             payload: payload,
             settings: settings,
             completion: completion,
-            name: name
+            name: name,
+            promptUsage: promptUsage,
+            completionUsage: completionUsage
         }));
     }
 
@@ -146,7 +158,7 @@ export default function PagePrompt() {
     // when stuff updates, cache it
     useEffect(() => {
         saveCache();
-    }, [payload, settings, completion, name]);
+    }, [payload, settings, completion, name, promptUsage, completionUsage]);
 
 
     const handleKeyPress = useCallback((e) => {
@@ -155,6 +167,7 @@ export default function PagePrompt() {
         }
         
     }, [payload, settings]);
+
 
 
     useEffect(() => {
@@ -166,6 +179,12 @@ export default function PagePrompt() {
         document.removeEventListener('keydown', handleKeyPress);
     };
     }, [handleKeyPress]);
+
+    const tokenEst = payload != null ? (
+        payload.length > 0 ?
+        Math.round(payload.split(" ").length * 1.36) :
+        0
+    ): 0;
 
   return (
     <PageLayoutFullHeight>
@@ -184,6 +203,7 @@ export default function PagePrompt() {
                         fontFamily:'Fira Code',
                         lineHeight:'1.5rem'
                 }}/>
+                <Typography variant="caption" color="text.secondary" sx={{fontFamily:'Fira Code', position:"absolute", bottom:25, left:25}}>Est Tokens: <span style={{color:theme.palette.primary.main}}>{tokenEst}</span></Typography>
                {/* <PromptField multiline /> */}
                </div>
             </Pane>
@@ -229,6 +249,12 @@ export default function PagePrompt() {
                 {running && <Typography variant="code" ><Skeleton style={{width:"60%"}}/></Typography>}
                 {running && <Typography variant="code" ><Skeleton style={{width:"50%"}}/></Typography>}
                 {running && <Typography variant="code" ><Skeleton style={{width:"20%"}}/></Typography>}
+                <Typography variant="caption" color="text.secondary" sx={{fontFamily:'Fira Code', position:"absolute", bottom:25, left:25}}>
+                    Prompt Tokens: <span style={{color:theme.palette.primary.main}}>{promptUsage}</span> &nbsp; &nbsp; 
+                    Completion Tokens: <span style={{color:theme.palette.primary.main}}>{completionUsage}</span>
+
+                    </Typography>
+
                 </div>
                 </div>
             </Pane>
