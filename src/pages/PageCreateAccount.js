@@ -4,6 +4,7 @@ import { LoadingButton } from '@mui/lab';
 import { styled } from '@mui/material/styles';
 import CreateAccountForm from '../sections/CreateAccountForm'
 import {useTitle} from "../routing/Routes";
+import Logo from '../components/Logo';
 
 const ContentStyle = styled('div')(({ theme }) => ({
     maxWidth: 480,
@@ -23,7 +24,8 @@ export default function PageCreateAccount({invite}) {
     <ContentStyle>
       <Stack direction="row" alignItems="center" sx={{ mb: 5 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h4" gutterBottom>
+          <Logo/>
+          <Typography variant="h4" sx={{mt:3}} gutterBottom>
               { invite ? "Join your team on Voxl" : "Create an Account" }
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>{

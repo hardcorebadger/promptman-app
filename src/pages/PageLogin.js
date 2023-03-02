@@ -4,6 +4,7 @@ import { LoadingButton } from '@mui/lab';
 import { styled } from '@mui/material/styles';
 import LoginForm from '../sections/LoginForm'
 import {useTitle} from "../routing/Routes";
+import Logo from '../components/Logo';
 
 const ContentStyle = styled('div')(({ theme }) => ({
     maxWidth: 480,
@@ -23,8 +24,9 @@ export default function PageLogin() {
     <ContentStyle>
       <Stack direction="row" alignItems="center" sx={{ mb: 5 }}>
         <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h4" gutterBottom>
-            Sign in to Voxl
+          <Logo />
+          <Typography variant="h4" sx={{mt:3}} gutterBottom>
+            Sign in to Hyperprompt
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>Enter your details below.</Typography>
         </Box>

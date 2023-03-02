@@ -11,7 +11,7 @@ import { useLocation, useParams } from "react-router-dom";
 
 export const CustomNode = (props) => {
   const { droppable, data } = props.node;
-  const indent = 10+ props.depth * 24;
+  const indent = 20+ props.depth * 24;
   const [isEditingName, setIsEditingName] = useState(false);
   const [curName, setCurName] = useState(props.node.text);
   const { pathname } = useLocation();

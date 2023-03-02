@@ -189,7 +189,7 @@ export default function DraggableTabsList(props) {
     else if (newTabs.length > 0) 
         setNavOnRefresh(newTabs[newTabs.length-1].value);
     else
-    setNavOnRefresh('/');
+        setNavOnRefresh('/');
   }
 
   // when we are about to reroute after clsing a tab, use the nw route

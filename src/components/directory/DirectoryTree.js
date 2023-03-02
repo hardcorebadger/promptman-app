@@ -13,6 +13,9 @@ import { LoadingButton } from "@mui/lab";
 import { Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import eventBus from "../../hooks/eventBus";
+import Iconify from "../Iconify";
+import {useTheme} from '@mui/material';
+
 
 export default function DirectoryTree() {
   const [treeData, setTreeData] = useState(null);
@@ -21,8 +24,11 @@ export default function DirectoryTree() {
   const [nodeList, setNodeList] = useState([]);
   const { user } = useAuth();
   const [isAddingGroup, setIsAddingGroup] = useState(false);
+  const [isAddingPrompt, setIsAddingPrompt] = useState(false);
+
   const [refresh, setRefresh] = useState(0);
   const navigate = useNavigate();
+  const theme = useTheme();
 
   function updateNode(node, depth, hasChild) {
     let checkExist = false;
@@ -169,10 +175,30 @@ export default function DirectoryTree() {
     setRefresh(refresh+1);
   }
 
+  async function createRootNode(type, name) {
+    setIsAddingPrompt(true);
+    let resp = await POST("/api/file/", {
+        type:type,
+        name:name,
+        project:user.project.id
+    });
+    setRefresh(refresh+1);
+    setIsAddingPrompt(false);
+  }
+
   useEffect(() => {
     console.log("refresh");
     loadFiles();
   }, [refresh]);
+
+  useEffect(() => {
+    eventBus.on("refreshFiles", (nothing) => {
+        setRefresh(refresh+1);
+    });
+    return () => {
+        eventBus.remove("refreshFiles");
+    }
+  }, []);
 
   if (treeData) {
 
@@ -180,9 +206,14 @@ export default function DirectoryTree() {
     <div style={{
         height: "100%",
         display: "flex",
-        flexDirection: "column"
+        flexDirection: "column",
+        backgroundColor: theme.palette.background.well
     }}>
-        <LoadingButton sx={{m:1}} variant="outlined" loading={isAddingGroup} onClick={() => addGroup()} >Add Group</LoadingButton>
+        <Stack direction="row" spacing={0} sx={{p:1, position:'absolute', bottom:0}}>
+        <LoadingButton fullWidth startIcon={<Iconify icon="material-symbols:add"/>} sx={{m:1}} variant="outlined" loading={isAddingGroup} onClick={() => addGroup()} >Group</LoadingButton>
+        <LoadingButton fullWidth startIcon={<Iconify icon="material-symbols:add"/>} sx={{m:1}} variant="outlined" loading={isAddingPrompt} onClick={() => createRootNode('prompt', 'New Prompt')} >Prompt</LoadingButton>
+
+        </Stack>
           <Tree
           style={{flexGrow:1}}
             tree={treeData}
@@ -276,7 +307,6 @@ function transformFileTree(files) {
         }
         tree.push(node);
     });
-    console.log(tree);
     return tree;
 }
 

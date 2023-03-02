@@ -1,8 +1,8 @@
 import * as React from 'react';
 import Footer from '../components/PageFooter';
-import { Container, Grid, Typography, Stack, Button, FormControl, Select, InputLabel, MenuItem, TextField, Toolbar, Divider, Slider, darken } from '@mui/material';
+import { Container, Grid, Typography, Stack, Button, FormControl, Select, InputLabel, MenuItem, TextField, Toolbar, Divider, Slider, darken, lighten, Skeleton } from '@mui/material';
 import {useAuth}  from '../contexts/AuthContext';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import eventBus from '../hooks/eventBus';
 import { useState, useEffect, useCallback } from 'react';
 import { GET, PUT } from '../contexts/AuthContext';
@@ -17,20 +17,21 @@ import { LoadingButton } from '@mui/lab';
 import { IntegrationInstructionsRounded } from '@mui/icons-material';
 
 
-const PromptField = styled(TextField)(({ theme })  => ({
-    width: "100%",
-    height: "100%",
+// const PromptField = styled(TextField)(({ theme })  => ({
+//     width: "100%",
+//     height: "100%",
 
-    "& .MuiInputBase-root.MuiOutlinedInput-root": {
-        width: "100%",
-        height: "100%",
-      },
-      "& .MuiInputBase-root.MuiOutlinedInput-root textarea": {
-        width: "100%",
-        height: "100%!important",
-        overflow:"scroll!important"
-      },
-  }));
+//     "& .MuiInputBase-root.MuiOutlinedInput-root": {
+//         width: "100%",
+//         height: "100%",
+//       },
+//       "& .MuiInputBase-root.MuiOutlinedInput-root textarea": {
+//         width: "100%",
+//         height: "100%!important",
+//         overflow:"scroll!important"
+//       },
+//   }));
+
 
 export default function PagePrompt() {
     const { logout, user } = useAuth();
@@ -39,25 +40,32 @@ export default function PagePrompt() {
     const [payload, setPayload] = useState("");
     const [settings, setSettings] = useState(null);
     const [running, setRunning] = useState(false);
+    const [runResp, setRunResp] = useState(null);
     const [completion, setCompletion] = useState(null);
     const theme = useTheme();
+    const navigate = useNavigate();
 
     async function loadPrompt() {
         let cache = loadCache();
-        if (cache != null) {
-            console.log(cache);
+        if (cache != null && cache.name != null && cache.name != "") {
             setCompletion(cache.completion);
             setPayload(cache.payload);
             setSettings(cache.settings);
             setName(cache.name);
             cache.id = id;
             eventBus.dispatch("promptOpened", cache);
+            // load it to make sure it exists
+            let resp = await GET("/api/prompt/"+id);
+            if (resp.success == false)
+                navigate('/');
         } else {
             setCompletion(null);
             setPayload("");
             setSettings(null);
             setName(null);
             let resp = await GET("/api/prompt/"+id);
+            if (resp.success == false)
+                navigate('/');
             setPayload(resp.response.prompt.payload);
             setSettings(resp.response.prompt.settings);
             setName(resp.response.prompt.name);
@@ -66,16 +74,31 @@ export default function PagePrompt() {
     }
 
     async function runPrompt() {
+        if (running)
+            return;
         setRunning(true);
-        // console.log(payload);
-        // console.log(settings);
         let resp = await PUT("/api/prompt/"+id+"/run", {
             "payload":payload,
             "settings":settings
         });
-        setCompletion(resp.response.completion);
+        setRunResp(resp);
         setRunning(false);
+        
     }
+
+    useEffect(() => {
+        if (runResp != null) {
+            let resp = runResp;
+            if (resp.response.prompt.id != id)
+                return;
+            if (resp.success) {
+                setCompletion(resp.response.completion.choices[0].text);
+            } else {
+                setCompletion(resp.response.message);
+            }
+            setRunResp(null);
+        }
+      }, [runResp]);
 
     function setModel(value) {
         setSettings({
@@ -116,6 +139,7 @@ export default function PagePrompt() {
     }
 
     useEffect(() => {
+        setRunning(false);
         loadPrompt();
       }, [id]);
 
@@ -149,7 +173,18 @@ export default function PagePrompt() {
         <StyledSplitPane split="horizontal" minSize={200} defaultSize={300} style={{height:"100%"}} primary="second">
             <Pane style={{height: '100%', width: '100%'}} className="">
                 <div style={{height: '100%', width: '100%', position:'relative', padding:25}} >
-               <PromptField multiline value={payload} onChange={(e) => setPayload(e.target.value)}/>
+                    <textarea value={payload}  onChange={(e) => setPayload(e.target.value)}
+                    placeholder="Prompt away..."
+                    style={{
+                        height: '100%', width: '100%',
+                        border:"none", outline: "none",
+                        backgroundColor: theme.palette.background.default,
+                        color:theme.palette.text.primary,
+                        fontSize:'0.9rem',
+                        fontFamily:'Fira Code',
+                        lineHeight:'1.5rem'
+                }}/>
+               {/* <PromptField multiline /> */}
                </div>
             </Pane>
             <Pane className="" style={{
@@ -158,7 +193,7 @@ export default function PagePrompt() {
             <div style={{height: '100%', width: '100%', position:'relative'
         }} >
             {settings &&
-                <Toolbar sx={{pt:2,pb:2}}>
+                <Toolbar sx={{pt:2,pb:2}} style={{backgroundColor: darken(theme.palette.background.default, 0.1)}}>
                     <Stack sx={{width:"100%"}} direction="row" alignItems="center" justifyContent="space-between">
                         <Stack direction="row" alignItems="center" justifyContent="flex-start" spacing={2}>
                         <Typography variant="caption">Model</Typography>
@@ -175,7 +210,7 @@ export default function PagePrompt() {
                         <Typography variant="caption">Tempurature</Typography>
                         <Slider aria-label="Temp" value={settings?.tempurature * 100} sx={{width:100}} size="small" onChange={(e, v) => setTemp(v/100)} />
                         <Typography variant="caption">Max Tokens</Typography>
-                        <Slider aria-label="Token" vvalue={settings?.max_tokens / 2048 * 100} sx={{width:100}} size="small" onChange={(e, v) => setMaxTokens(v / 100 * 2048)}/>
+                        <Slider aria-label="Token" vvalue={settings?.max_tokens / 2048 * 100} sx={{width:100}} size="small" onChange={(e, v) => setMaxTokens(Math.max(150,(v / 100 * 2048)))}/>
                         </Stack>
                         <Stack direction="row" alignItems="center" justifyContent="flex-end">
                         <LoadingButton variant="contained" color='success' onClick={runPrompt} loading={running}
@@ -189,8 +224,11 @@ export default function PagePrompt() {
 }
                 <Divider />
                 
-                <div style={{height: 'calc(100% - 80px)', minHeight: 'calc(100% - 80px)', overflowY:'scroll', width: '100%', position:'relative', padding:'20px', backgroundColor: darken(theme.palette.background.default, 0.1)}}>
-                <Typography variant="code">{completion?.choices[0].text}</Typography>
+                <div style={{height: 'calc(100% - 80px)', minHeight: 'calc(100% - 80px)', overflowY:'scroll', width: '100%', position:'relative', padding:'25px', backgroundColor: darken(theme.palette.background.default, 0.1)}}>
+                {!running && <Typography variant="code" style={{whiteSpace:"pre-line"}}>{completion}</Typography>}
+                {running && <Typography variant="code" ><Skeleton style={{width:"60%"}}/></Typography>}
+                {running && <Typography variant="code" ><Skeleton style={{width:"50%"}}/></Typography>}
+                {running && <Typography variant="code" ><Skeleton style={{width:"20%"}}/></Typography>}
                 </div>
                 </div>
             </Pane>

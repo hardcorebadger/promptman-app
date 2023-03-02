@@ -237,8 +237,9 @@ const theme = createTheme({
       fontWeight:"bold"
     },
     code: {
-      fontSize:"0.9rem",
-      fontFamily: "'Source Code Pro', monospace"
+      fontSize:"1rem",
+      fontFamily: "'Fira Code', 'Source Code Pro', monospace",
+      opacity:0.85,
     }
 
   },

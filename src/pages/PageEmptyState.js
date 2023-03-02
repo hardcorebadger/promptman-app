@@ -18,11 +18,28 @@ import { styled } from '@mui/material/styles';
 import LoginForm from '../sections/LoginForm'
 import {useTitle} from "../routing/Routes";
 import {Link as RouterLink, Outlet, useNavigate} from "react-router-dom";
-import {GET, POST} from "../contexts/AuthContext";
+import {GET, POST, useAuth} from "../contexts/AuthContext";
 import {useState} from "react";
+import Iconify from '../components/Iconify';
+import eventBus from '../hooks/eventBus';
 
 export default function PageEmptyState({invite, token}) {
     useTitle("Accept Invitation");
+    const { user } = useAuth();
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    async function newPrompt() {
+        setLoading(true);
+        let resp = await POST("/api/file/", {
+            type:"prompt",
+            name:"New Prompt",
+            project:user.project.id
+        });
+        eventBus.dispatch("refreshFiles",{});
+        navigate('/dashboard/prompt/'+resp.response.file.content_id);
+        setLoading(false);
+      }
 
     return (
         <Box sx={{ position: 'relative', width: '100%', height: 'calc(100vh - 60px)' }}>
@@ -32,7 +49,10 @@ export default function PageEmptyState({invite, token}) {
                         <Typography variant="h5" textAlign={"center"} gutterBottom>
                             Feels empty in here...
                         </Typography>
-                        <Typography textAlign={"center"} sx={{ color: 'text.secondary' }}>You don't have access to any properties. Contact your team members to receive an invite.</Typography>
+                        <Typography textAlign={"center"} sx={{ color: 'text.secondary' }}>If you're new here, you can start by creating a prompt below. Otherwise, select one of your prompts to get started. Happy prompting!</Typography>
+                        <Stack direction="row" spacing={0} justifyContent="center">
+                            <LoadingButton size="large" startIcon={<Iconify icon="material-symbols:add"/>} sx={{m:1}} variant="contained" loading={loading} onClick={newPrompt} >Create a Prompt</LoadingButton>
+                        </Stack>
                     </Stack>
                 </Container>
             </Box>

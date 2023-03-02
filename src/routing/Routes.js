@@ -20,7 +20,7 @@ const ROOTS_AUTH = '/auth';
 export function useTitle(title) {
   useEffect(() => {
     const prevTitle = document.title
-    document.title = "MUIStrap - " + title
+    document.title = "Hyperprompt - " + title
     return () => {
       document.title = prevTitle
     }

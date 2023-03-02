@@ -6,21 +6,21 @@ import Toolbar from '@mui/material/Toolbar';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { Outlet } from "react-router-dom";
-import { styled } from '@mui/material/styles';
+import { styled, useTheme } from '@mui/material/styles';
 
 
 const drawerWidth = 250;
 
 const StyledDrawer = styled(Drawer)(({ theme }) => ({
   '& .MuiDrawer-paper': {
-    backgroundColor: theme.palette.background.default
+    backgroundColor: theme.palette.background.well
   }
 }));
 
 
 export default function DashboardLayout() {
   const [mobileOpen, setMobileOpen] = React.useState(false);
-
+  const theme = useTheme();
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -51,6 +51,7 @@ export default function DashboardLayout() {
         </StyledDrawer>
         <StyledDrawer
           variant="permanent"
+          
           sx={{
             display: { xs: 'none', sm: 'block' },
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
