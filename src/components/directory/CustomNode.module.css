@@ -4,12 +4,17 @@
   }
 
 .root:hover {
-background-color: #153151;
+background-color: #123354;
 }
 
 .root.selected {
-    background-color: #153151;
-}   
+    background-color: #123354;
+    color: #90caf9;
+}  
+
+.root.selected svg path {
+    fill: #90caf9;
+} 
 
 .root .actionMenu {
 opacity: 0;

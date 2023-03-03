@@ -187,7 +187,6 @@ export default function DirectoryTree() {
   }
 
   useEffect(() => {
-    console.log("refresh");
     loadFiles();
   }, [refresh]);
 

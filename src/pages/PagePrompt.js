@@ -249,13 +249,14 @@ export default function PagePrompt() {
                 {running && <Typography variant="code" ><Skeleton style={{width:"60%"}}/></Typography>}
                 {running && <Typography variant="code" ><Skeleton style={{width:"50%"}}/></Typography>}
                 {running && <Typography variant="code" ><Skeleton style={{width:"20%"}}/></Typography>}
+                
+
+                </div>
                 <Typography variant="caption" color="text.secondary" sx={{fontFamily:'Fira Code', position:"absolute", bottom:25, left:25}}>
                     Prompt Tokens: <span style={{color:theme.palette.primary.main}}>{promptUsage}</span> &nbsp; &nbsp; 
                     Completion Tokens: <span style={{color:theme.palette.primary.main}}>{completionUsage}</span>
 
                     </Typography>
-
-                </div>
                 </div>
             </Pane>
         </StyledSplitPane>
