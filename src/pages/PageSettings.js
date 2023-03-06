@@ -18,27 +18,33 @@ import { styled } from '@mui/material/styles';
 import LoginForm from '../sections/LoginForm'
 import {useTitle} from "../routing/Routes";
 import {Link as RouterLink, Outlet, useNavigate} from "react-router-dom";
-import {GET, POST, useAuth} from "../contexts/AuthContext";
+import {GET, PUT, useAuth} from "../contexts/AuthContext";
 import {useState} from "react";
 import Iconify from '../components/Iconify';
 import eventBus from '../hooks/eventBus';
 
 export default function PageSettings({invite, token}) {
     useTitle("Settings");
-    const { user } = useAuth();
+    const { user, refreshUser } = useAuth();
     const [loading, setLoading] = useState(false);
-    const [key, setKey] = useState("");
+    const [error, setError] = useState(null);
+    const [key, setKey] = useState(user.project.openai_api_key === null ? '' : user.project.openai_api_key);
     const navigate = useNavigate();
 
     async function setApiKey() {
         setLoading(true);
-        let resp = await POST("/api/file/", {
-            type:"prompt",
-            name:"New Prompt",
-            project:user.project.id
+        setError(null);
+        let resp = await PUT("/api/project/"+user.project.id+"/api_key", {
+            openai_api_key:key
         });
-        eventBus.dispatch("refreshFiles",{});
-        navigate('/dashboard/prompt/'+resp.response.file.content_id);
+        if (resp.success) {
+            refreshUser();
+        } else {
+            setError({
+                severity:'error', 
+                display:resp.response.message
+            });
+        }
         setLoading(false);
       }
 
@@ -54,11 +60,19 @@ export default function PageSettings({invite, token}) {
                         </Typography>
                         <Typography textAlign={"center"} sx={{ color: 'text.secondary' }}>Enter your OpenAI API Key to use hyperprompt.</Typography>
                        </Stack>
-                        <Stack direction="column" spacing={1}>
+                       {error &&
+                            <Alert severity={error.severity} sx={{ mb: 3 }}>
+                                {error.display}
+                            </Alert>
+                            }
+                        <Stack direction="row" spacing={1}>
+                            
                             <TextField
+                            fullWidth
                                 name="apikey"
                                 label="API Key"
                                 type='password'
+                                placeholder='sk-........'
                                 value={key}
                                 onChange={e => setKey(e.target.value)}
                                 InputProps={{
@@ -71,7 +85,7 @@ export default function PageSettings({invite, token}) {
                                     ),
                                 }}
                              />
-                            <LoadingButton size="large" startIcon={<Iconify icon="material-symbols:add"/>} sx={{m:1}} variant="contained" loading={loading} onClick={setApiKey} >Create a Prompt</LoadingButton>
+                            <LoadingButton size="large" sx={{m:1}} variant="contained" loading={loading} onClick={setApiKey} >Save</LoadingButton>
                         </Stack>
                         <Typography  textAlign={"center"} variant="caption" color="text.secondary"> Using your own API key allows you to pay for token usage directly and keeps Hyperpropt 100% free. 
                         If you don't have an API key, <Link href="https://elephas.app/blog/how-to-create-openai-api-keys-cl5c4f21d281431po7k8fgyol0" target="_blank">here's</Link> a good guide on getting started!</Typography>

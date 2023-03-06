@@ -22,6 +22,7 @@ import {
   } from 'react-router-dom';
 import { StaticRouter } from 'react-router-dom/server';
 import eventBus from "../../hooks/eventBus";
+import { useAuth } from "../../contexts/AuthContext";
 
 // function useRouteMatch(patterns) {
 //     const { pathname } = useLocation();
@@ -89,8 +90,9 @@ const StyledTab = styled((props) => <Tab disableRipple {...props} />)(
   );
 
 export default function DraggableTabsList(props) {
+    const { user } = useAuth();
     const [navOnRefresh, setNavOnRefresh] = useState(null);
-    const [tabs, setTabs] = useState(loadCache());
+    const [tabs, setTabs] = useState(loadCache(user.project.id));
     const [newTab, setNewTab] = useState(null);
     const { pathname } = useLocation();
     const { id } = useParams();
@@ -167,7 +169,7 @@ export default function DraggableTabsList(props) {
       }, []);
 
     useEffect(() => {
-        localStorage.setItem("tabs-cache", JSON.stringify(tabs));
+        localStorage.setItem("tabs-cache", JSON.stringify({pid:user.project.id, tabs:tabs}));
     }, [tabs]);
 
   const onDragEnd = (result) => {
@@ -297,13 +299,15 @@ export default function DraggableTabsList(props) {
   );
 }
 
-function loadCache() {
+function loadCache(pid) {
    let raw = localStorage.getItem("tabs-cache");
    if (raw == null) {
         return [];
    }
    let parsed = JSON.parse(raw);
-   if (parsed.length < 1)
+   if (parsed.pid === null || parsed.pid != pid)
         return [];
-   return parsed;
+   if (parsed.tabs.length < 1)
+        return [];
+   return parsed.tabs;
 }

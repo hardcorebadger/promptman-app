@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Container, Checkbox, Typography, Box, Stack, Link, Alert, Tooltip, TextField, InputAdornment, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../components/Iconify'
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, Navigate } from "react-router-dom";
 import { useAuth, axiosInstance } from '../contexts/AuthContext';
 // ----------------------------------------------------------------------
 
@@ -19,7 +19,7 @@ export default function LoginForm() {
             await login(email, password);
         } catch (error) {
             console.error(error);
-            setError({show:true,severity:'error',display:'Incorrect email or password'});
+            setError({show:true,severity:'error',display:error.response.data.message});
 
         }
     };

@@ -6,6 +6,7 @@ import {GET, useAuth} from '../contexts/AuthContext';
 // pages
 import Login from '../pages/PageLogin';
 import Register from '../pages/PageCreateAccount';
+import Settings from '../pages/PageSettings';
 
 // components
 import LoadingScreen from './LoadingScreen';
@@ -28,6 +29,10 @@ export default function AuthGuard({ children }) {
   if (!isAuthenticated) {
     return <Login/>;
   } 
+
+  if (!user.api_validation) {
+    return <Settings/>
+  }
  
   return <div>{children}</div>;
   

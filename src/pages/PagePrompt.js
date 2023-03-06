@@ -57,11 +57,11 @@ export default function PagePrompt() {
             setCompletionUsage(cache.completionUsage);
             setName(cache.name);
             cache.id = id;
-            eventBus.dispatch("promptOpened", cache);
+            // eventBus.dispatch("promptOpened", cache);
             // load it to make sure it exists
             let resp = await GET("/api/prompt/"+id);
             if (resp.success == false)
-                navigate('/');
+                navigate('/dashboard/home', {replace:true});
         } else {
             setCompletion(null);
             setPayload("");
@@ -71,11 +71,13 @@ export default function PagePrompt() {
             setCompletionUsage(0);
             let resp = await GET("/api/prompt/"+id);
             if (resp.success == false)
-                navigate('/');
-            setPayload(resp.response.prompt.payload);
-            setSettings(resp.response.prompt.settings);
-            setName(resp.response.prompt.name);
-            eventBus.dispatch("promptOpened", resp.response.prompt);
+                navigate('/dashboard/home', {replace:true});
+            else {
+                setPayload(resp.response.prompt.payload);
+                setSettings(resp.response.prompt.settings);
+                setName(resp.response.prompt.name);
+                eventBus.dispatch("promptOpened", resp.response.prompt);
+            }
         }
     }
 
