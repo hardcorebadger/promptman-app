@@ -32,7 +32,7 @@ export default function CreateAccountForm({invite}) {
                 // const msg = error.response.data;
                 // const fields = Object.keys(msg);
                 // const err = msg[fields[0]];
-                setError({show:true,severity:'error',display: "There was an error"});
+                setError({show:true,severity:'error',display: error.response.data.message});
             }
         }
    
