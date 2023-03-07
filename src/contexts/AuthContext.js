@@ -66,6 +66,7 @@ const AuthContext = createContext({
   ...initialState,
   method: 'jwt',
   login: () => Promise.resolve(),
+  googleLogin: () => Promise.resolve(),
   logout: () => Promise.resolve(),
   register: () => Promise.resolve()
 });
@@ -142,6 +143,25 @@ export function AuthProvider({ children }) {
     });
   };
 
+  const googleLogin = async (credential, client_id) => {
+    const response = await axiosInstance.post('/api/google', {
+      credential
+    });
+    console.log(response.data);
+
+    const { access_token, user } = response.data;
+    console.log(user);
+    setSession(access_token);
+
+
+    dispatch({
+      type: 'LOGIN',
+      payload: {
+        user: user
+      },
+    });
+  };
+
   const register = async (email, name, password) => {
     let q = {
       "email": email,
@@ -191,6 +211,7 @@ export function AuthProvider({ children }) {
       value={{
         ...state,
         login,
+        googleLogin,
         logout,
         register,
         refreshUser,

@@ -5,10 +5,12 @@ import { LoadingButton } from '@mui/lab';
 import Iconify from '../components/Iconify'
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {useAuth, axiosInstance, POST} from '../contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
+
 // ----------------------------------------------------------------------
 
 export default function CreateAccountForm({invite}) {
-    const { register } = useAuth();
+    const { register, googleLogin } = useAuth();
     const [first, setFirst] = useState("");
     const [last, setLast] = useState("");
     const [email, setEmail] = useState(invite != null ? invite.invite.email : "");
@@ -38,6 +40,21 @@ export default function CreateAccountForm({invite}) {
    
     };
 
+    const googleSuccess = async (r) => {
+        console.log(r);
+        try {
+            await googleLogin(r.credential);
+        } catch (error) {
+            console.error(error);
+            setError({show:true,severity:'error',display:error.response.data.message});
+
+        }
+    }
+
+    const googleError = (r) => {
+        setError({show:true,severity:'error',display:'Please complete Google authentication'});
+    }
+
   return (
       <form onSubmit={submit}>
           {error.show &&
@@ -57,6 +74,7 @@ export default function CreateAccountForm({invite}) {
             <TextField fullWidth name="cpassword" label="Confirm Password" type="password" onChange={e => setCpassword(e.target.value)} />
             
             <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={false}>Register</LoadingButton>
+            <GoogleLogin onSuccess={googleSuccess} onError={googleError} />
         <Typography textAlign={"center"} sx={{mt:2}}>
             Already have an account?&nbsp;
             <Link component={RouterLink} variant="subtitle2" to='/auth/login'>
