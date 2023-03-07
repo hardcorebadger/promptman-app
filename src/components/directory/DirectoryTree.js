@@ -163,16 +163,17 @@ export default function DirectoryTree() {
   }
 
  function onSelect(id) {
-    mixpanel.track('Opened Prompt');
+    clickAway();
     let node = getNode(id);
     if (node.data.fileType == "group")
         return;
+    mixpanel.track('Opened Prompt');
+
     let path = '/dashboard/' + node.data.fileType + '/' + node.data.content
     navigate(path);
   }
 
   function clickAway() {
-    console.log("click a");
     setClickawayCount(clickawayCount+1);
   }
 
@@ -215,8 +216,9 @@ export default function DirectoryTree() {
   if (treeData) {
 
   return (
+    <ClickAwayListener onClickAway={clickAway}>
 
-    <div style={{
+    <div onClick={clickAway} style={{
         height: "100%",
         display: "flex",
         flexDirection: "column",
@@ -227,8 +229,6 @@ export default function DirectoryTree() {
         <LoadingButton fullWidth startIcon={<Iconify icon="material-symbols:add"/>} sx={{m:1}} variant="outlined" loading={isAddingPrompt} onClick={() => createRootNode('prompt', 'New Prompt')} >Prompt</LoadingButton>
 
         </Stack>
-        <ClickAwayListener onClickAway={clickAway}>
-
           <Tree
           style={{flexGrow:1}}
             tree={treeData}
@@ -300,9 +300,8 @@ export default function DirectoryTree() {
               dropTarget: styles.dropTarget
             }}
           />
-               </ClickAwayListener>
-
      </div>
+     </ClickAwayListener>
 
   );
 

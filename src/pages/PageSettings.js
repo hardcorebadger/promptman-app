@@ -22,6 +22,8 @@ import {GET, PUT, useAuth} from "../contexts/AuthContext";
 import {useState} from "react";
 import Iconify from '../components/Iconify';
 import eventBus from '../hooks/eventBus';
+import mixpanel from 'mixpanel-browser';
+
 
 export default function PageSettings({invite, token}) {
     useTitle("Settings");
