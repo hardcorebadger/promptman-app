@@ -24,6 +24,10 @@ export default function LoginForm() {
         }
     };
 
+    const googleSuccess = () => {
+        console.log("yay");
+    }
+
   return (
       <form onSubmit={submit}>
           {error.show &&
