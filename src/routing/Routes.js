@@ -53,6 +53,19 @@ const Loadable = (Component) => (props) => {
 export default function Router() {
   const location = useLocation();
 
+  useEffect(() => {
+    let page = "Other";
+
+    if (location.pathname.startsWith("/dashboard/prompt")) {
+      page = "Prompt";
+    } else if (location.pathname == "/dashboard/home") {
+      page = "Home";
+    } else  if (location.pathname.startsWith("/dashboard/settings")) {
+      page = "Settings";
+    } 
+     mixpanel.track('Viewed Page', {"Path":location.pathname, "Page":page});
+  }, [location]);
+
   return useRoutes([
     {
       path: '/',

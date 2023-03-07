@@ -32,14 +32,17 @@ export default function PageSettings({invite, token}) {
     const navigate = useNavigate();
 
     async function setApiKey() {
+        mixpanel.track('Submitted OpenAI API Key');
         setLoading(true);
         setError(null);
         let resp = await PUT("/api/project/"+user.project.id+"/api_key", {
             openai_api_key:key
         });
         if (resp.success) {
+            mixpanel.track('Linked OpenAI API Key');
             refreshUser();
         } else {
+            mixpanel.track('Failed to Link OpenAI API Key');
             setError({
                 severity:'error', 
                 display:resp.response.message

@@ -132,6 +132,11 @@ export function AuthProvider({ children }) {
     });
     const { access_token, user } = response.data;
     console.log(user);
+    mixpanel.identify(user.email);
+    mixpanel.people.set({ "User ID": user.id });
+    mixpanel.people.set({ "Email": user.email });
+    mixpanel.people.set({ "Name": user.name });
+    mixpanel.track('Log in');
     setSession(access_token);
 
 
@@ -151,6 +156,11 @@ export function AuthProvider({ children }) {
 
     const { access_token, user } = response.data;
     console.log(user);
+    mixpanel.identify(user.email);
+    mixpanel.people.set({ "User ID": user.id });
+    mixpanel.people.set({ "Email": user.email });
+    mixpanel.people.set({ "Name": user.name });
+    mixpanel.track('Log in');
     setSession(access_token);
 
 
@@ -172,6 +182,11 @@ export function AuthProvider({ children }) {
     const response = await axiosInstance.post('/api/register', q);
     const { access_token, user } = response.data;
     console.log(user);
+    mixpanel.identify(user.email);
+    mixpanel.people.set({ "User ID": user.id });
+    mixpanel.people.set({ "Email": user.email });
+    mixpanel.people.set({ "Name": user.name });
+    mixpanel.track('Register');
     setSession(access_token);
 
     dispatch({

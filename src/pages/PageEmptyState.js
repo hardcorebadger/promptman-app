@@ -30,6 +30,7 @@ export default function PageEmptyState({invite, token}) {
     const navigate = useNavigate();
 
     async function newPrompt() {
+        mixpanel.track('Created Prompt');
         setLoading(true);
         let resp = await POST("/api/file/", {
             type:"prompt",

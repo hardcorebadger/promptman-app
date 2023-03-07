@@ -123,6 +123,7 @@ export default function DirectoryTree() {
   }
 
   async function addGroup() {
+    mixpanel.track('Created Group');
     setIsAddingGroup(true);
     let resp = await POST("/api/file/", {
         "project":user.project.id,
@@ -144,6 +145,7 @@ export default function DirectoryTree() {
   }
 
   async function updateFileName(id, name) {
+    mixpanel.track('Renamed File');
     let n = getNode(id);
     n.text = name;
     let resp = await PUT("/api/file/"+id, {"name":name});
@@ -152,6 +154,7 @@ export default function DirectoryTree() {
   }
 
   async function onDelete(id) {
+    mixpanel.track('Deleted File');
     let n = getNode(id);
     let resp = await DELETE("/api/file/"+id);
     setRefresh(refresh+1);
@@ -159,6 +162,7 @@ export default function DirectoryTree() {
   }
 
  function onSelect(id) {
+    mixpanel.track('Opened Prompt');
     let node = getNode(id);
     if (node.data.fileType == "group")
         return;
@@ -167,6 +171,7 @@ export default function DirectoryTree() {
   }
 
   async function createChild(parentId, type, name) {
+    mixpanel.track('Created Prompt');
     let resp = await POST("/api/file/", {
         parent:parentId,
         type:type,
@@ -177,6 +182,7 @@ export default function DirectoryTree() {
   }
 
   async function createRootNode(type, name) {
+    mixpanel.track('Created Prompt');
     setIsAddingPrompt(true);
     let resp = await POST("/api/file/", {
         type:type,
