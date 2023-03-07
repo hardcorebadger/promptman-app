@@ -10,12 +10,12 @@ import styles from "./DirectoryTree.module.css";
 import SampleData from "./sample_data.json";
 import { useAuth, GET, PUT, POST, DELETE } from "../../contexts/AuthContext"
 import { LoadingButton } from "@mui/lab";
-import { Stack } from "@mui/material";
+import { ClickAwayListener, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import eventBus from "../../hooks/eventBus";
 import Iconify from "../Iconify";
 import {useTheme} from '@mui/material';
-
+import mixpanel from 'mixpanel-browser';
 
 export default function DirectoryTree() {
   const [treeData, setTreeData] = useState(null);
@@ -25,6 +25,7 @@ export default function DirectoryTree() {
   const { user } = useAuth();
   const [isAddingGroup, setIsAddingGroup] = useState(false);
   const [isAddingPrompt, setIsAddingPrompt] = useState(false);
+  const [clickawayCount, setClickawayCount] = useState(0);
 
   const [refresh, setRefresh] = useState(0);
   const navigate = useNavigate();
@@ -123,6 +124,7 @@ export default function DirectoryTree() {
   }
 
   async function addGroup() {
+    mixpanel.track('Created Group');
     setIsAddingGroup(true);
     let resp = await POST("/api/file/", {
         "project":user.project.id,
@@ -144,6 +146,7 @@ export default function DirectoryTree() {
   }
 
   async function updateFileName(id, name) {
+    mixpanel.track('Renamed File');
     let n = getNode(id);
     n.text = name;
     let resp = await PUT("/api/file/"+id, {"name":name});
@@ -152,6 +155,7 @@ export default function DirectoryTree() {
   }
 
   async function onDelete(id) {
+    mixpanel.track('Deleted File');
     let n = getNode(id);
     let resp = await DELETE("/api/file/"+id);
     setRefresh(refresh+1);
@@ -159,6 +163,7 @@ export default function DirectoryTree() {
   }
 
  function onSelect(id) {
+    mixpanel.track('Opened Prompt');
     let node = getNode(id);
     if (node.data.fileType == "group")
         return;
@@ -166,7 +171,13 @@ export default function DirectoryTree() {
     navigate(path);
   }
 
+  function clickAway() {
+    console.log("click a");
+    setClickawayCount(clickawayCount+1);
+  }
+
   async function createChild(parentId, type, name) {
+    mixpanel.track('Created Prompt');
     let resp = await POST("/api/file/", {
         parent:parentId,
         type:type,
@@ -177,6 +188,7 @@ export default function DirectoryTree() {
   }
 
   async function createRootNode(type, name) {
+    mixpanel.track('Created Prompt');
     setIsAddingPrompt(true);
     let resp = await POST("/api/file/", {
         type:type,
@@ -203,6 +215,7 @@ export default function DirectoryTree() {
   if (treeData) {
 
   return (
+
     <div style={{
         height: "100%",
         display: "flex",
@@ -214,6 +227,8 @@ export default function DirectoryTree() {
         <LoadingButton fullWidth startIcon={<Iconify icon="material-symbols:add"/>} sx={{m:1}} variant="outlined" loading={isAddingPrompt} onClick={() => createRootNode('prompt', 'New Prompt')} >Prompt</LoadingButton>
 
         </Stack>
+        <ClickAwayListener onClickAway={clickAway}>
+
           <Tree
           style={{flexGrow:1}}
             tree={treeData}
@@ -239,6 +254,7 @@ export default function DirectoryTree() {
                 updateNode={(value) => {
                   updateNode(value, depth, hasChild);
                 }}
+                clickaway={clickawayCount}
               />
             )}
             dragPreviewRender={(monitorProps) => (
@@ -284,7 +300,10 @@ export default function DirectoryTree() {
               dropTarget: styles.dropTarget
             }}
           />
+               </ClickAwayListener>
+
      </div>
+
   );
 
     } else {

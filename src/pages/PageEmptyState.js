@@ -22,6 +22,7 @@ import {GET, POST, useAuth} from "../contexts/AuthContext";
 import {useState} from "react";
 import Iconify from '../components/Iconify';
 import eventBus from '../hooks/eventBus';
+import mixpanel from 'mixpanel-browser';
 
 export default function PageEmptyState({invite, token}) {
     useTitle("Welcome");
@@ -30,6 +31,7 @@ export default function PageEmptyState({invite, token}) {
     const navigate = useNavigate();
 
     async function newPrompt() {
+        mixpanel.track('Created Prompt');
         setLoading(true);
         let resp = await POST("/api/file/", {
             type:"prompt",

@@ -11,7 +11,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
-mixpanel.init('5acfcd5a37cfe3c4a6af78b0fcae4352', {debug: false});
+mixpanel.init('e536abe925d9784859af2e6375e426e9', {debug: false}); 
 LicenseInfo.setLicenseKey(
     '4bb4e0380ced9f6000f7f44b17a7f071T1JERVI6NDI5NjIsRVhQSVJZPTE2ODMxNTUwNjMwMDAsS0VZVkVSU0lPTj0x',
 );
