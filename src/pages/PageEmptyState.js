@@ -24,7 +24,7 @@ import Iconify from '../components/Iconify';
 import eventBus from '../hooks/eventBus';
 
 export default function PageEmptyState({invite, token}) {
-    useTitle("Accept Invitation");
+    useTitle("Welcome");
     const { user } = useAuth();
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();

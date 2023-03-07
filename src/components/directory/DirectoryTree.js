@@ -147,6 +147,7 @@ export default function DirectoryTree() {
     let n = getNode(id);
     n.text = name;
     let resp = await PUT("/api/file/"+id, {"name":name});
+    setRefresh(refresh+1);
     eventBus.dispatch("fileRenamed", n);
   }
 

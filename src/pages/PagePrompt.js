@@ -57,11 +57,11 @@ export default function PagePrompt() {
             setCompletionUsage(cache.completionUsage);
             setName(cache.name);
             cache.id = id;
-            eventBus.dispatch("promptOpened", cache);
+            // eventBus.dispatch("promptOpened", cache);
             // load it to make sure it exists
             let resp = await GET("/api/prompt/"+id);
             if (resp.success == false)
-                navigate('/');
+                navigate('/dashboard/home', {replace:true});
         } else {
             setCompletion(null);
             setPayload("");
@@ -71,11 +71,13 @@ export default function PagePrompt() {
             setCompletionUsage(0);
             let resp = await GET("/api/prompt/"+id);
             if (resp.success == false)
-                navigate('/');
-            setPayload(resp.response.prompt.payload);
-            setSettings(resp.response.prompt.settings);
-            setName(resp.response.prompt.name);
-            eventBus.dispatch("promptOpened", resp.response.prompt);
+                navigate('/dashboard/home', {replace:true});
+            else {
+                setPayload(resp.response.prompt.payload);
+                setSettings(resp.response.prompt.settings);
+                setName(resp.response.prompt.name);
+                eventBus.dispatch("promptOpened", resp.response.prompt);
+            }
         }
     }
 
@@ -191,7 +193,7 @@ export default function PagePrompt() {
 <div style={{height: '100%', width: '100%', position:'relative', backgroundColor: theme.palette.background.default}}>
         <StyledSplitPane split="horizontal" minSize={200} defaultSize={300} style={{height:"100%"}} primary="second">
             <Pane style={{height: '100%', width: '100%'}} className="">
-                <div style={{height: '100%', width: '100%', position:'relative', padding:25}} >
+                <div style={{height: '100%', width: '100%', position:'relative', padding:25, paddingBottom:50}} >
                     <textarea value={payload}  onChange={(e) => setPayload(e.target.value)}
                     placeholder="Prompt away..."
                     style={{
@@ -244,7 +246,7 @@ export default function PagePrompt() {
 }
                 <Divider />
                 
-                <div style={{height: 'calc(100% - 80px)', minHeight: 'calc(100% - 80px)', overflowY:'scroll', width: '100%', position:'relative', padding:'25px', backgroundColor: darken(theme.palette.background.default, 0.1)}}>
+                <div style={{height: 'calc(100% - 80px)', minHeight: 'calc(100% - 80px)', overflowY:'scroll', width: '100%', position:'relative', padding:'25px',paddingBottom:'50px', backgroundColor: darken(theme.palette.background.default, 0.1)}}>
                 {!running && <Typography variant="code" style={{whiteSpace:"pre-line"}}>{completion}</Typography>}
                 {running && <Typography variant="code" ><Skeleton style={{width:"60%"}}/></Typography>}
                 {running && <Typography variant="code" ><Skeleton style={{width:"50%"}}/></Typography>}

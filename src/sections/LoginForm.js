@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { Container, Checkbox, Typography, Box, Stack, Link, Alert, Tooltip, TextField, InputAdornment, IconButton } from '@mui/material';
 import { LoadingButton } from '@mui/lab';
 import Iconify from '../components/Iconify'
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, Navigate } from "react-router-dom";
 import { useAuth, axiosInstance } from '../contexts/AuthContext';
+import { GoogleLogin } from '@react-oauth/google';
 // ----------------------------------------------------------------------
 
 export default function LoginForm() {
-    const { login } = useAuth();
+    const { login, googleLogin } = useAuth();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState({show:false,severity:'info',display:''})
@@ -19,10 +20,25 @@ export default function LoginForm() {
             await login(email, password);
         } catch (error) {
             console.error(error);
-            setError({show:true,severity:'error',display:'Incorrect email or password'});
+            setError({show:true,severity:'error',display:error.response.data.message});
 
         }
     };
+
+    const googleSuccess = async (r) => {
+        console.log(r);
+        try {
+            await googleLogin(r.credential);
+        } catch (error) {
+            console.error(error);
+            setError({show:true,severity:'error',display:error.response.data.message});
+
+        }
+    }
+
+    const googleError = (r) => {
+        setError({show:true,severity:'error',display:'Please complete Google authentication'});
+    }
 
   return (
       <form onSubmit={submit}>
@@ -54,6 +70,7 @@ export default function LoginForm() {
         <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={false}>
             Login
         </LoadingButton>
+        <GoogleLogin onSuccess={googleSuccess} onError={googleError} />
     </Stack>
 
 
