@@ -47,7 +47,6 @@ export function EditableTypographyControlled({variant, value, isEditing, onChang
 
     if (isEditing) {
         return (
-            <ClickAwayListener onClickAway={onEsc}>
             <TextField 
             onClick={(event) => event.stopPropagation()}
             /* styles the wrapper */
@@ -64,7 +63,6 @@ export function EditableTypographyControlled({variant, value, isEditing, onChang
                 onChange(event.target.value);
             }}
             />
-            </ClickAwayListener>
         );
     } else {
         return (

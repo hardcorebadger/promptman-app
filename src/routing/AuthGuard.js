@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import navigationService from "./NavigationService";
 import useQueryString from "../hooks/useQueryString";
 // ----------------------------------------------------------------------
+import mixpanel from 'mixpanel-browser';
 
 AuthGuard.propTypes = {
   children: PropTypes.node,

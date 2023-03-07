@@ -56,6 +56,13 @@ export const CustomNode = (props) => {
     props.updateNode(props.node);
   }, [props.hasChild]);
 
+  useEffect(() => {
+    if (isEditingName) {
+        props.updateName(props.node.id,curName);
+        setIsEditingName(false);
+    }
+  }, [props.clickaway]);
+
   // useEffect(() => {
   //   console.log("Dragging", props.node.text);
 
@@ -75,7 +82,7 @@ return (
             <div onClick={handleToggle}>
                 <TypeIcon droppable={droppable} fileType={data?.fileType} isOpen={props.isOpen} />
             </div>
-            <EditableTypographyControlled variant="body2" isEditing={isEditingName} onEsc={() => {setIsEditingName(false);props.updateName(props.node.id,curName)}} onChange={setCurName} value={curName} />
+            <EditableTypographyControlled variant="body2" isEditing={isEditingName} onChange={setCurName} value={curName} />
         </Stack>
         <Stack direction="row" justifyContent="flex-end" alignItems="center">
             <ActionMenu className={styles.actionMenu}
